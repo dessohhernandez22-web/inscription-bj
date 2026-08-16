@@ -27,6 +27,7 @@ import DetailEcole from './pages/DetailEcole'
 import Inscription from './pages/Inscription'
 import SuiviDossier from './pages/SuiviDossier'
 import Login from './pages/Login'
+import Register from './pages/Register'
 
 import ConnexionEcole from './pages/ConnexionEcole'
 import AdminDashboard from './pages/AdminDashboard'
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/ecole/connexion" element={<ConnexionEcole />} />
           <Route path="/suivi" element={<SuiviDossier />} />
           <Route path="/connexion" element={<Login />} />
+          <Route path="/inscription" element={<Register />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/parent" element={<DashboardParent />} />
           <Route path="/parent/resultats" element={<BulletinsParent />} />

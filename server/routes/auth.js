@@ -27,8 +27,27 @@ router.post('/register', async (req, res) => {
     if (!email || !password || !nom || !prenom) {
       return res.status(400).json({ error: 'Champs requis : email, password, nom, prenom' })
     }
-    // Inscription publique désactivée — les comptes sont créés par l'admin ou un directeur
-    return res.status(403).json({ error: 'L\'inscription publique est désactivée. Contactez un administrateur ou votre établissement.' })
+    if (role === 'directeur') {
+      return res.status(403).json({ error: 'Les comptes directeurs sont créés par l\'administration. Utilisez l\'espace admin.' })
+    }
+    const db = await getDb()
+    const existing = db.exec(`SELECT id FROM users WHERE email = '${email.replace(/'/g, "''")}'`)
+    if (existing.length && existing[0].values.length) {
+      return res.status(409).json({ error: 'Cet email est déjà utilisé' })
+    }
+    const hashed = await bcrypt.hash(password, 10)
+    const esc = s => (s != null ? String(s).replace(/'/g, "''") : '')
+    db.exec(`INSERT INTO users (email, password, nom, prenom, telephone, role) VALUES ('${esc(email)}', '${esc(hashed)}', '${esc(nom)}', '${esc(prenom)}', '${esc(telephone)}', 'parent')`)
+    saveDb()
+    const rows = db.exec('SELECT * FROM users ORDER BY id DESC LIMIT 1')
+    if (!rows.length || !rows[0].values.length) {
+      return res.status(500).json({ error: 'Erreur création compte' })
+    }
+    const row = rows[0]
+    const obj = {}
+    row.columns.forEach((col, i) => { obj[col] = row.values[0][i] })
+    const token = jwt.sign({ id: obj.id, email: obj.email, role: obj.role, ecoleId: obj.ecoleId }, SECRET, { expiresIn: '7d' })
+    res.status(201).json({ token, user: { id: obj.id, email: obj.email, nom: obj.nom, prenom: obj.prenom, role: obj.role, ecoleId: obj.ecoleId } })
   } catch (e) {
     console.error('Register error:', e)
     res.status(500).json({ error: 'Erreur serveur' })

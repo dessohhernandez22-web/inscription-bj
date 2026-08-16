@@ -51,9 +51,9 @@ export default function Login() {
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
           <p className="text-center text-sm text-gray-500">
-            Mot de passe oublié ?{' '}
-            <Link to="/ecole/connexion" className="text-benin-green font-medium hover:underline">
-              Espace école
+            Pas encore de compte ?{' '}
+            <Link to="/inscription" className="text-benin-green font-medium hover:underline">
+              Créer un compte
             </Link>
           </p>
         </form>
